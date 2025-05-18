@@ -2,20 +2,19 @@ package david;
 
 import java.util.*;
 
-
 public class ProductoAseo extends Producto1 {
 
-   private String tipoDeAseo;
+    private String tipoDeAseo;
 
     public ProductoAseo() {
     }
 
-    public ProductoAseo(String nombre, int cantidad, double precio, double peso, String unidad, String tipoDeAseo, ArrayList<Producto1> productoS) {
-        super(nombre, cantidad, precio, peso, unidad, productoS);
+    public ProductoAseo(String nombre, int cantidad, double precio, double peso, String unidad, String tipoDeAseo, ArrayList<Producto1> productos) {
+        super(nombre, cantidad, precio, peso, unidad, productos);
         this.tipoDeAseo = tipoDeAseo;
     }
-    public void monstrarInformacionProductoAseo(){
-        System.out.println("*** Producto de Aseo ***");
+
+    public void mostrarInformacionProductoAseo() {
         System.out.println("Nombre: " + getNombre());
         System.out.println("Cantidad: " + getCantidad());
         System.out.println("Precio: " + getPrecio());
@@ -34,63 +33,17 @@ public class ProductoAseo extends Producto1 {
         return false;
     }
 
-    // Añade un producto a la lista si es compatible
-    @Override
-    public void agregarProducto(Producto1 producto) {
-        if (producto != null && esCompatible(producto)) {
-            getProductoS().add(producto);
-            System.out.println("Producto de aseo " + producto.getNombre() + " agregado.");
-        } else {
-            System.out.println("Error: No se puede agregar el producto.");
-        }
-    }
-
-    // Elimina un producto de la lista por nombre
-    @Override
-    public void eliminarProducto(Scanner scanner) {
-        System.out.println("Ingrese el nombre del producto de aseo a eliminar:");
-        String nombre = scanner.nextLine();
-        boolean encontrado = false;
-
-        // Busca el producto en la lista
-        for (int i = 0; i < getProductoS().size(); i++) {
-            Producto1 producto = getProductoS().get(i);
-            if (esCompatible(producto) && producto.getNombre().equalsIgnoreCase(nombre)) {
-                getProductoS().remove(i);
-                System.out.println("Producto de aseo " + nombre + " eliminado.");
-                encontrado = true;
-                break;
-            }
-        }
-
-        if (!encontrado) {
-            System.out.println("No se encontró el producto de aseo " + nombre + ".");
-        }
-    }
-
-    @Override
-    public void totalProductos() {
-        int total = 0;
-
-        for (Producto1 producto : getProductoS()) {
-            if (esCompatible(producto)) {
-                total += producto.getCantidad();
-            }
-        }
-
-        System.out.println("Total de productos de aseo: " + total);
-    }
-
     @Override
     public void mostrarProductos() {
-        System.out.println("Lista de productos de aseo (Tipo: " + tipoDeAseo + "):");
+        System.out.println("=== Lista de productos de aseo (Tipo: " + tipoDeAseo + ") ===");
         boolean hayProductosAseo = false;
 
-        for (Producto1 producto : getProductoS()) {
+        for (int i = 0; i < getProductos().size(); i++) {
+            Producto1 producto = getProductos().get(i);
             if (esCompatible(producto)) {
-                System.out.println("-------------------------");
+                System.out.println((i + 1) + ". ");
                 ProductoAseo aseo = (ProductoAseo) producto;
-                aseo.monstrarInformacionProductoAseo();
+                aseo.mostrarInformacionProductoAseo();
                 hayProductosAseo = true;
             }
         }
@@ -100,6 +53,20 @@ public class ProductoAseo extends Producto1 {
         }
     }
 
+    @Override
+    protected void modificarPropiedadesEspecificas(Scanner scanner, Producto1 producto) {
+
+    }
+
+    @Override
+    protected void modificarPropiedadEspecifica(Scanner scanner, Producto1 producto, int opcion) {
+
+    }
+
+    @Override
+    protected void mostrarInformacionProducto(Producto1 producto) {
+        ((ProductoAseo) producto).mostrarInformacionProductoAseo();
+    }
     public String getTipoDeAseo() {
         return tipoDeAseo;
     }
@@ -107,8 +74,4 @@ public class ProductoAseo extends Producto1 {
     public void setTipoDeAseo(String tipoDeAseo) {
         this.tipoDeAseo = tipoDeAseo;
     }
-
-
-
-
 }

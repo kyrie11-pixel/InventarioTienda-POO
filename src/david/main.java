@@ -1,99 +1,135 @@
 package david;
 
-
 import java.util.*;
 
 public class main {
 
-    private static final int MINI_VALUE = 1;
-    private static final int MAX_VALUE = 3;
+
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Producto1> inventario = new ArrayList<>();
         Producto1 gestor;
+        boolean continuar = true;
 
+        while (continuar) {
+            mostrarPrincipal();
+            Integer tipoInventario = obtenerEntero(scanner,1, 4);
 
-        System.out.println("=== Sistema de Inventario ===");
-        System.out.println("Seleccione el tipo de inventario:");
-        System.out.println("1. Alimentos");
-        System.out.println("2. Productos de aseo");
-        System.out.println("3. Muebles");
-        System.out.print("Opción (" + MINI_VALUE + "-" + MAX_VALUE + "): ");
-        int tipoInventario = obtenerEntero(scanner, MINI_VALUE, MAX_VALUE);
-
-        if (tipoInventario == 1) {
-            System.out.print("Ingrese el tipo de alimento (ej. Lácteo, Cárnico): ");
-            String tipoAlimento = scanner.nextLine();
-            gestor = new Alimento("Gestor Alimentos", 0, 0.0, 0.0, "kg", inventario, "N/A", tipoAlimento);
-        } else if (tipoInventario == 2) {
-            System.out.print("Ingrese el tipo de aseo (ej. Personal, Hogar): ");
-            String tipoAseo = scanner.nextLine();
-            gestor = new ProductoAseo("Gestor Aseo", 0, 0.0, 0.0, "kg", tipoAseo, inventario);
-        } else {
-            System.out.print("Ingrese el tipo de mueble (ej. Sala, Cocina, Habitación): ");
-            String tipoMueble = scanner.nextLine();
-            gestor = new ProductoMuebles("Gestor Muebles", 0, 0.0, 0.0, "kg", tipoMueble, 0.0, 0.0, inventario);
-        }
-
-        while (true) {
-            mostrarMenu();
-            int opcion = obtenerEntero(scanner, 1, 5);
-            scanner.nextLine(); // Limpiar el búfer
-
-            switch (opcion) {
-                case 1 -> {Producto1 nuevoProducto = crearProducto(scanner, tipoInventario);
-                    gestor.agregarProducto(nuevoProducto);
-                }
-                case 2 -> {
-                    gestor.eliminarProducto(scanner);
-                }
-                case 3 -> {
-                    gestor.totalProductos();
-                }
-                case 4 -> {
-                    gestor.mostrarProductos();
-                }
-                case 5 -> {
-                    System.out.println("¡Gracias por usar el sistema de inventario!");
-                    break;
-                }
+            if (tipoInventario == 1) {
+                gestor = crearGestorAlimentos(scanner, inventario);
+            } else if (tipoInventario == 2) {
+                gestor = crearGestorAseo(scanner, inventario);
+            } else if (tipoInventario == 3) {
+                gestor = crearGestorMuebles(scanner, inventario);
+            } else {
+                continuar = false;
+                break;
             }
 
+            boolean mostrarMenu = true;
+            while (mostrarMenu) {
+                mostrarMenu();
+                int opcion = obtenerEntero(scanner, 1, 5);
+                switch (opcion) {
+                    case 1 -> agregarProducto(scanner, gestor, tipoInventario);
+                    case 2 -> gestor.eliminarProducto(scanner);
+                    case 3 -> gestor.totalProductos();
+                    case 4 -> gestor.modificarProducto(scanner);
+                    case 5 -> {
+                        System.out.println("Volviendo al menú principal.");
+                        mostrarMenu = false;
+                    }
+                    default -> System.out.println("Opción inválida.");
+                }
+            }
         }
+        System.out.println("¡Gracias por usar el sistema de inventario!");
+        System.out.println("Cerrando el programa...");
+    }
 
-
+    public static void mostrarPrincipal() {
+        System.out.println("╔════════════════════════════════════════╗");
+        System.out.println("║           Sistema de Inventario        ║");
+        System.out.println("╠════════════════════════════════════════╣");
+        System.out.println("║  Seleccione el tipo de inventario:     ║");
+        System.out.println("║                                        ║");
+        System.out.println("║  1. Alimentos (Comida/Bebida)          ║");
+        System.out.println("║  2. Productos de Aseo (Hogar/Personal) ║");
+        System.out.println("║  3. Muebles (Cocina/Sala/Habitacion)   ║");
+        System.out.println("║  4. Salir                              ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out.print("   Opción (" + 1 + "-" + 4 + "): ");
     }
 
     private static void mostrarMenu() {
-        System.out.println("=========================");
-        System.out.println();
-        System.out.println("    Menú de Inventario");
-        System.out.println("=========================");
-        System.out.println();
-        System.out.println("1. Agregar producto");
-        System.out.println("2. Eliminar producto");
-        System.out.println("3. Mostrar total de productos");
-        System.out.println("4. Mostrar productos");
-        System.out.println("5. Salir");
-        System.out.print("Seleccione una opción (1-5): ");
+        System.out.println("╔════════════════════════════════════════╗");
+        System.out.println("║             Menú de Inventario         ║");
+        System.out.println("╠════════════════════════════════════════╣");
+        System.out.println("║  1. Agregar producto                   ║");
+        System.out.println("║  2. Eliminar producto                  ║");
+        System.out.println("║  3. Mostrar total de productos         ║");
+        System.out.println("║  4. Modificar producto                 ║");
+        System.out.println("║  5. Volver al Menú Principal           ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out.print("   Seleccione una opción (1-5): ");
     }
 
     private static int obtenerEntero(Scanner scanner, int min, int max) {
+        int numero;
         while (true) {
             try {
-                int numero = Integer.parseInt(scanner.nextLine());
+                numero = Integer.parseInt(scanner.nextLine().replace(",","."));
                 if (numero >= min && numero <= max) {
                     return numero;
                 }
-                System.out.print("Por favor, ingrese un número entre " + min + " y " + max + ": ");
+                System.out.print("   Por favor, ingrese un número entre " + min + " y " + max + ": ");
             } catch (NumberFormatException e) {
-                System.out.print("Entrada inválida. Ingrese un número: ");
+                System.out.print("   Entrada inválida. Ingrese un número: ");
             }
         }
     }
 
-    private static Producto1 crearProducto(Scanner scanner, int tipoInventario) {
+    private static Producto1 crearGestorAlimentos(Scanner scanner, ArrayList<Producto1> inventario) {
+        System.out.println("Seleccione el tipo de alimento:");
+        System.out.println();
+        System.out.println("1. comida ");
+        System.out.println("2. Bebida");
+        System.out.print("Opción (1-2): ");
+        int opcionAlimento = obtenerEntero(scanner, 1, 2);
+        String tipoAlimento = (opcionAlimento == 1) ? "comida" : "Bebida";
+        return new Alimento("Gestor Alimentos", 0, 0.0, 0.0, "Unidad", inventario, "N/A", tipoAlimento);
+    }
+
+    private static Producto1 crearGestorAseo(Scanner scanner, ArrayList<Producto1> inventario) {
+        System.out.println("Seleccione el tipo de aseo:");
+        System.out.println();
+        System.out.println("1. Hogar");
+        System.out.println("2. Personal");
+        System.out.print("Opción (1-2): ");
+        int opcionAseo = obtenerEntero(scanner, 1, 2);
+        String tipoAseo = (opcionAseo == 1) ? "Hogar" : "Personal";
+        return new ProductoAseo("Gestor Aseo", 0, 0.0, 0.0, "Unidad", tipoAseo, inventario);
+    }
+
+    private static Producto1 crearGestorMuebles(Scanner scanner, ArrayList<Producto1> inventario) {
+        System.out.println("Seleccione el tipo de mueble:");
+        System.out.println();
+        System.out.println("1. Cocina");
+        System.out.println("2. Sala");
+        System.out.println("3. Habitacion");
+        System.out.print("Opción (1-3): ");
+        int opcionMueble = obtenerEntero(scanner, 1, 3);
+        String tipoMueble = null;
+        switch (opcionMueble) {
+            case 1 -> tipoMueble = "Cocina";
+            case 2 -> tipoMueble = "Sala";
+            case 3 -> tipoMueble = "Habitacion";
+        }
+        return new ProductoMuebles("Gestor Muebles", 0, 0.0, 0.0, "Unidad", tipoMueble, 0.0, 0.0, inventario);
+    }
+
+    private static void agregarProducto(Scanner scanner, Producto1 gestor, int tipoInventario) {
         System.out.println("=== Ingresar nuevo producto ===");
         System.out.println();
         System.out.print("Nombre: ");
@@ -106,7 +142,7 @@ public class main {
         double precio;
         while (true) {
             try {
-                precio = Double.parseDouble(scanner.nextLine());
+                precio = Double.parseDouble(scanner.nextLine().replace(",","."));
                 if (precio >= 0) {
                     break;
                 }
@@ -120,7 +156,7 @@ public class main {
         double peso;
         while (true) {
             try {
-                peso = Double.parseDouble(scanner.nextLine());
+                peso = Double.parseDouble(scanner.nextLine().replace(",","."));
                 if (peso >= 0) {
                     break;
                 }
@@ -133,19 +169,18 @@ public class main {
         System.out.print("Unidad (ej. kg, L): ");
         String unidad = scanner.nextLine();
 
+        Producto1 nuevoProducto = null;
+
         if (tipoInventario == 1) {
             System.out.print("Fecha de caducidad (ej. 2025-12-31): ");
             String fecha = scanner.nextLine();
-            System.out.print("Tipo de alimento (ej. Lácteo, Cárnico): ");
-            String tipo = scanner.nextLine();
-            return new Alimento(nombre, cantidad, precio, peso, unidad, null, fecha, tipo);
+            String tipoAlimento = ((Alimento) gestor).getTipoDeAlimento();
+            nuevoProducto = new Alimento(nombre, cantidad, precio, peso, unidad, null, fecha, tipoAlimento);
         } else if (tipoInventario == 2) {
-            System.out.print("Tipo de aseo (ej. Personal, Hogar): ");
-            String tipoAseo = scanner.nextLine();
-            return new ProductoAseo(nombre, cantidad, precio, peso, unidad, tipoAseo, null);
+            String tipoAseo = ((ProductoAseo) gestor).getTipoDeAseo();
+            nuevoProducto = new ProductoAseo(nombre, cantidad, precio, peso, unidad, tipoAseo, null);
         } else {
-            System.out.print("Tipo de mueble (ej. Sala, Cocina, Habitación): ");
-            String tipoMueble = scanner.nextLine();
+            String tipoMueble = ((ProductoMuebles) gestor).getTipoDeMueble();
             System.out.print("Alto (metros): ");
             double alto;
             while (true) {
@@ -161,6 +196,7 @@ public class main {
             }
             System.out.print("Ancho (metros): ");
             double ancho;
+
             while (true) {
                 try {
                     ancho = Double.parseDouble(scanner.nextLine());
@@ -172,8 +208,11 @@ public class main {
                     System.out.print("Entrada inválida. Ingrese un número: ");
                 }
             }
-            return new ProductoMuebles(nombre, cantidad, precio, peso, unidad, tipoMueble, alto, ancho, null);
+            nuevoProducto = new ProductoMuebles(nombre, cantidad, precio, peso, unidad, tipoMueble, alto, ancho, null);
+        }
+
+        if (nuevoProducto != null) {
+            gestor.agregarProducto(nuevoProducto);
         }
     }
 }
-
