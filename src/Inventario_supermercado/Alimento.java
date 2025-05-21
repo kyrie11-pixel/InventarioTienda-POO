@@ -1,9 +1,8 @@
-package david;
-
+package Inventario_supermercado;
 import java.util.*;
 
-public class Alimento extends Producto1 {
 
+public class Alimento extends Producto1 {
     private String fechaDeCaducidad;
     private String tipoDeAlimento;
 
@@ -32,8 +31,8 @@ public class Alimento extends Producto1 {
 
 
     @Override
-    public Boolean esCompatible(Producto1 otro) {
-        if (otro  instanceof Alimento) {
+    public boolean esCompatible(Producto1 otro) {
+        if (otro instanceof Alimento) {
             Alimento alimento = (Alimento) otro;
             return this.tipoDeAlimento.equals(alimento.getTipoDeAlimento());
         }
@@ -42,33 +41,23 @@ public class Alimento extends Producto1 {
 
     @Override
     public void mostrarProductos() {
-        System.out.println("=== Lista de alimentos (Tipo: " + tipoDeAlimento + ") ===");
+        System.out.println("=== Lista de productos alimenticios (" + tipoDeAlimento + ") ===");
         boolean hayAlimentos = false;
 
-        for (int i = 0; i < getProductos().size(); i++) {
-            Producto1 producto = getProductos().get(i);
-            if (esCompatible(producto)) {
-                System.out.println((i + 1) + ". ");
-                Alimento alimento = (Alimento) producto;
-                alimento.mostrarInformacion();
-                hayAlimentos = true;
+        if (getProductos() != null) {
+            for (int i = 0; i < getProductos().size(); i++) {
+                Producto1 producto = getProductos().get(i);
+                if (esCompatible(producto)) {
+                    System.out.println((i + 1) + ". ");
+                    Alimento alimento = (Alimento) producto;
+                    alimento.mostrarInformacion();
+                    hayAlimentos = true;
+                }
             }
         }
+
         if (!hayAlimentos) {
             System.out.println("No hay alimentos de este tipo.");
-        }
-    }
-
-    @Override
-    protected void modificarPropiedadesEspecificas(Scanner scanner, Producto1 producto) {
-        System.out.println("6. Fecha de Caducidad");
-    }
-
-    @Override
-    protected void modificarPropiedadEspecifica(Scanner scanner, Producto1 producto, int opcion) {
-        if (opcion == 6) {
-            System.out.print("Nueva fecha de caducidad: ");
-            ((Alimento) producto).setFechaDeCaducidad(scanner.nextLine());
         }
     }
 
@@ -77,10 +66,22 @@ public class Alimento extends Producto1 {
         ((Alimento) producto).mostrarInformacion();
     }
 
+    @Override
+    public List<String> modificarPropiedadesEspecificas() {
+        List<String> propiedades = new ArrayList<>();
+        propiedades.add("Fecha de caducidad");
+        return propiedades;
+    }
 
-
-    public String getFechaDeCaducidad() {
-        return fechaDeCaducidad;
+    @Override
+    public void modificarPropiedadEspecifica(Producto1 producto, int indicePropiedad, String valor) {
+        if (producto instanceof Alimento && indicePropiedad == 0) {
+            ((Alimento) producto).setFechaDeCaducidad(valor);
+        }
+    }
+    @Override
+    public String obtenerTipo() {
+        return "Alimento";
     }
 
     public void setFechaDeCaducidad(String fechaDeCaducidad) {
@@ -94,5 +95,4 @@ public class Alimento extends Producto1 {
     public void setTipoDeAlimento(String tipoDeAlimento) {
         this.tipoDeAlimento = tipoDeAlimento;
     }
-
 }

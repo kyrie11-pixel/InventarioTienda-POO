@@ -1,9 +1,8 @@
-package david;
+package Inventario_supermercado;
 
 import java.util.*;
 
 public class ProductoMuebles extends Producto1 {
-
     private String tipoDeMueble;
     private double alto;
     private double ancho;
@@ -30,7 +29,7 @@ public class ProductoMuebles extends Producto1 {
     }
 
     @Override
-    public Boolean esCompatible(Producto1 otro) {
+    public boolean esCompatible(Producto1 otro) {
         if (otro instanceof ProductoMuebles) {
             ProductoMuebles mueble = (ProductoMuebles) otro;
             return this.tipoDeMueble.equals(mueble.getTipoDeMueble());
@@ -40,38 +39,21 @@ public class ProductoMuebles extends Producto1 {
 
     @Override
     public void mostrarProductos() {
-        System.out.println("=== Lista de muebles (Tipo: " + tipoDeMueble + ") ===");
+        System.out.println("=== Lista de Muebles (" + tipoDeMueble + ") ===");
         boolean hayMuebles = false;
-
-        for (int i = 0; i < getProductos().size(); i++) {
-            Producto1 producto = getProductos().get(i);
-            if (esCompatible(producto)) {
-                System.out.println((i + 1) + ". "); // Mostrar número de producto
-                ProductoMuebles mueble = (ProductoMuebles) producto;
-                mueble.mostrarInformacionProductoMueble();
-                hayMuebles = true;
+        if (getProductos() != null) {
+            for (int i = 0; i < getProductos().size(); i++) {
+                Producto1 producto = getProductos().get(i);
+                if (esCompatible(producto)) {
+                    System.out.println((i + 1) + ". ");
+                    ProductoMuebles mueble = (ProductoMuebles) producto;
+                    mueble.mostrarInformacionProductoMueble();
+                    hayMuebles = true;
+                }
             }
         }
-
         if (!hayMuebles) {
             System.out.println("No hay muebles de este tipo.");
-        }
-    }
-
-    @Override
-    protected void modificarPropiedadesEspecificas(Scanner scanner, Producto1 producto) {
-        System.out.println("6. Alto");
-        System.out.println("7. Ancho");
-    }
-
-    @Override
-    protected void modificarPropiedadEspecifica(Scanner scanner, Producto1 producto, int opcion) {
-        if (opcion == 6) {
-            System.out.print("Nuevo alto: ");
-            ((ProductoMuebles) producto).setAlto(Double.parseDouble(scanner.nextLine()));
-        } else if (opcion == 7) {
-            System.out.print("Nuevo ancho: ");
-            ((ProductoMuebles) producto).setAncho(Double.parseDouble(scanner.nextLine()));
         }
     }
 
@@ -79,6 +61,36 @@ public class ProductoMuebles extends Producto1 {
     protected void mostrarInformacionProducto(Producto1 producto) {
         ((ProductoMuebles) producto).mostrarInformacionProductoMueble();
     }
+
+    @Override
+    public List<String> modificarPropiedadesEspecificas() {
+        List<String> propiedades = new ArrayList<>();
+        propiedades.add("Alto");
+        propiedades.add("Ancho");
+        return propiedades;
+    }
+
+    @Override
+    public void modificarPropiedadEspecifica(Producto1 producto, int indicePropiedad, String valor) {
+        if (producto instanceof ProductoMuebles) {
+            ProductoMuebles mueble = (ProductoMuebles) producto;
+            try {
+                double valorDouble = Double.parseDouble(valor);
+                if (indicePropiedad == 0) {
+                    mueble.setAlto(valorDouble);
+                } else if (indicePropiedad == 1) {
+                    mueble.setAncho(valorDouble);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Valor inválido para " + (indicePropiedad == 0 ? "alto" : "ancho"));
+            }
+        }
+    }
+    @Override
+    public String obtenerTipo() {
+        return "Mueble";
+    }
+
     public String getTipoDeMueble() {
         return tipoDeMueble;
     }
@@ -102,5 +114,5 @@ public class ProductoMuebles extends Producto1 {
     public void setAncho(double ancho) {
         this.ancho = ancho;
     }
-
 }
+
